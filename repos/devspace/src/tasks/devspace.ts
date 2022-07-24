@@ -1,14 +1,15 @@
-import { start } from 'start'
+import { cmd } from './cmd'
+import { start } from './start'
 
 const devspace = {
   name: 'devspace',
   alias: ['ds', 'dev'],
   tasks: {
+    cmd,
     start,
     ...require('./attach'),
     ...require('./build'),
     ...require('./clean'),
-    ...require('./cmd'),
     ...require('./deploy'),
     ...require('./log'),
     ...require('./run'),

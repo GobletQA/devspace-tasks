@@ -2,7 +2,7 @@ import path from 'path'
 import { existsSync } from 'fs'
 import { execSync } from 'child_process'
 import { camelCase } from '@keg-hub/jsutils'
-import { TConfigPaths } from '../shared.types'
+import { TReposPaths } from '../shared.types'
 
 /**
  * Finds all sub-repo paths from the reposPath directory that contain a package.json file
@@ -10,7 +10,7 @@ import { TConfigPaths } from '../shared.types'
  *
  * @return {Object} - Found repo paths by camel-case name
  */
-export const getRepoPaths = (reposPath:string):TConfigPaths => {
+export const getRepoPaths = (reposPath:string):TReposPaths => {
   // list of the repo names located at `<root>/repos`
   return execSync('ls', { cwd: reposPath })
     .toString()

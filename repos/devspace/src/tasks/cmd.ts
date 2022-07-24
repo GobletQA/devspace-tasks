@@ -33,13 +33,11 @@ const command = async ({ task, params, config }) => {
   return await devspace([cmd, `--debug`], params, config)
 }
 
-module.exports = {
-  cmd: {
-    name: 'cmd',
-    alias: ['analyze', 'render', 'print', 'ui'],
-    action: command,
-    example: 'yarn dev <cmd> <options>',
-    description: 'Calls the devspace command',
-    options: {},
-  },
+export const cmd = {
+  name: 'cmd',
+  alias: ['analyze', 'render', 'print', 'ui'],
+  action: command,
+  example: 'yarn dev <cmd> <options>',
+  description: 'Calls the devspace command',
+  options: {},
 }

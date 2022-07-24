@@ -1,5 +1,37 @@
 import { TAliasContext } from './contexts/contexts.types'
 
+export type TTaskOptionType = 'arr' | 'array' | 'obj' | 'object' | 'num' | 'number' | 'boolean' | 'bool' | 'string' | 'str'
+
+export type TTaskOption = {
+  env?: string
+  alias?: string[],
+  example?: string,
+  description?: string,
+  type?: TTaskOptionType,
+  [key:string]: any
+}
+
+export type TTaskOptions = Record<string, TTaskOption>
+
+export type TTaskArgs = {
+  task: TTask
+  command: string
+  options: string[]
+  params: TTaskParams
+  tasks: Record<string, TTask>
+  [key:string]: any
+}
+
+export type TTask = {
+  name: string,
+  alias?: string[],
+  example?: string,
+  description?: string,
+  options?: TTaskOptions
+  action: (args:TTaskArgs) => any,
+  [key:string]: any
+}
+
 export type JSONObject = {
   [key: string]: JSONVal
 }
@@ -11,6 +43,7 @@ export type TParam = JSONVal
 export type TTaskParams = {
   env?: TEnv
   context?: string
+  log: boolean
   [key:string]: TParam
 }
 
@@ -61,6 +94,7 @@ export type TInRepo = {
   deployment?: string
   image?: string
   imageTag?: string
+  dockerFile?: string
   [key: string]: any
 }
 
@@ -69,17 +103,20 @@ export type TInRepos = {
 }
 
 export type TRepo = {
-  envs?: TEnvs
+  envs: TEnvs
   name: string
   path: string
   label: string
   short: string
-  image: string
   alias: string[]
   ports: string[]
-  imageTag: string
+  image: string
   deployment: string
+  imageTag?: string
+  valuesFile?: string
   dockerFile?: string
+  configsDir?: string
+  devspaceDir?: string
 }
 
 export type TRepos = {
@@ -99,8 +136,17 @@ export type TEnvs = {
 }
 
 // The key name should match the name of the corresponding repo when repo path is not set
+export type TReposPaths = {
+  [key: string]: string
+}
+
 export type TConfigPaths = {
+  repos: TReposPaths
   rootDir: string
-  dockerFiles?: string
-  [key:string]: string
+  homeDir: string
+  reposDir: string
+  valuesDir?: string
+  configsDir?: string
+  devspaceDir?: string
+  dockerFilesDir?: string
 }

@@ -5,29 +5,36 @@ import { buildRepos } from '@TSKShared/repos/buildRepos'
 import { getRepoPaths } from '@TSKShared/repos/getRepoPaths'
 import { getReposPath } from '@TSKShared/repos/getReposPath'
 import { aliasContexts } from '@TSKShared/contexts/aliasContexts'
-import { TDevSpaceConfig, TDSConfig } from '@TSKShared/devspace/devspace.types'
+import { selectorContexts } from '@TSKShared/contexts/selectorContexts'
+import { TInDSConfig, TDSConfig } from '@TSKShared/devspace/devspace.types'
 
-export const configureDevSpace = (input:TDevSpaceConfig) => {
+export const configureDevSpace = (input:TInDSConfig) => {
   const { rootDir } = input
   const homeDir = os.homedir()
 
-  const config:Record<string, any> = {}
+  const config:Partial<TDSConfig> = {}
   config.envs = deepMerge(input.envs) as TEnvs
 
   const reposDir = getReposPath(rootDir, input.reposDir, homeDir)
   const paths = getRepoPaths(reposDir)
-  const repos = buildRepos(input.repos, paths, rootDir)
 
+  config.repos = buildRepos(input.repos, paths, rootDir)
   config.aliasContext = aliasContexts(config.repos)
 
   config.paths = {
     rootDir,
-    homeDir,
     reposDir,
     repos: paths,
-    // TODO: add a way to resolve the devspace.yml file || or don't allow it to be overriden
-    devspaceDir: rootDir
+    homeDir: input.homeDir || homeDir,
+    // TODO: add helper to search for these paths automatically
+    // Should allow absolute || relative to root || relative to home
+    valuesDir: input.valuesDir,
+    configsDir: input.configsDir,
+    devspaceDir: input.devspaceDir,
+    dockerFilesDir: input.dockerFilesDir,
   }
+
+  config.selectors = selectorContexts(config as TDSConfig)
 
   return config as TDSConfig
 }

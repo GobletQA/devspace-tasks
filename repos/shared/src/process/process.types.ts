@@ -8,6 +8,8 @@ export type TExecResp = {
   exitCode: number
 }
 
+export type TCmdResp = TExecResp | string | number
+
 export type TCmdParams = {
   envs?:TEnvs
   cwd?: string
@@ -22,4 +24,4 @@ export type TCmdMethod = (
     cmd:TCmd,
     params:TCmdParams,
     validExitCode?:string[]
-  ) => Promise<string|number|TExecResp>
+  ) => Promise<TCmdResp>

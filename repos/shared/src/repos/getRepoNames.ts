@@ -1,4 +1,4 @@
-const { getRepoPaths } = require('./getRepoPaths')
+import { getRepoPaths } from './getRepoPaths'
 
 /**
  * Return a list of folder names from <root>/repos

@@ -8,7 +8,7 @@ const { addBuildArgs } = require('../../utils/docker/addBuildArgs')
 const { addPlatforms } = require('../../utils/docker/addPlatforms')
 const { getDockerFile } = require('../../utils/docker/getDockerFile')
 const { resolveImgTags } = require('../../utils/docker/resolveImgTags')
-const { resolveContext } = require('../../utils/kubectl/resolveContext')
+const { resolveContext } = require('../../utils/contexts/resolveContext')
 const { getDockerLabels } = require('../../utils/docker/getDockerLabels')
 const { getDockerBuildParams } = require('../../utils/docker/getDockerBuildParams')
 const { appContextAlias, dbContextAlias, shortContextMap } = require('../../constants')
@@ -84,13 +84,15 @@ const buildImg = async (args) => {
 
   const builtTags = await resolveImgTags(params, docFileCtx, envs)
 
+  // TODO: get the dockerFileCtx, and use that to find the repo
+  // Use the repo to find the dockerFileDir
   const cmdArgs = [
     `buildx`,
     `build`,
     ...getDockerBuildParams(params),
     ...builtTags,
     ...getDockerLabels(docFileCtx, envs),
-    ...getDockerFile(docFileCtx),
+    ...getDockerFile(config, docFileCtx),
     ...addPlatforms(platforms, push),
     ...addBuildArgs(allEnvs, docFileCtx),
     `.`,

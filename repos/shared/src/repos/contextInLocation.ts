@@ -1,4 +1,4 @@
-const { exists, ensureArr } = require('@keg-hub/jsutils')
+import { exists, ensureArr } from '@keg-hub/jsutils'
 
 type ContextLoc = string | string[]
 

@@ -1,4 +1,4 @@
-const { noPropArr } = require('@keg-hub/jsutils')
+import { noPropArr } from '@keg-hub/jsutils'
 
 /**
  * Generates a string of platforms the image should be built for
@@ -7,10 +7,7 @@ const { noPropArr } = require('@keg-hub/jsutils')
  *
  * @returns {Array<string>} - Platforms converted into the docker build argument format
  */
-const addPlatforms = (platforms = noPropArr, push) => {
+export const addPlatforms = (platforms = noPropArr, push) => {
   return platforms.length && push ? [`--platform`, platforms.join(`,`)] : noPropArr
 }
 
-module.exports = {
-  addPlatforms,
-}

@@ -1,5 +1,6 @@
-const { ensureArr, isArr, toBool, isStr } = require('@keg-hub/jsutils')
-const { resolveContext } = require('../../utils/kubectl/resolveContext')
+import { TaskConfig, TTaskParams } from '../shared.types'
+import { resolveContext } from '../contexts/resolveContext'
+import { ensureArr, isArr, toBool, isStr } from '@keg-hub/jsutils'
 
 /**
  * Finds the ports to bind from the localhost to a docker container
@@ -9,23 +10,24 @@ const { resolveContext } = require('../../utils/kubectl/resolveContext')
  *
  * @returns {Array} - Ports to be bound
  */
-const resolveAllPorts = (params, envs, docFileCtx, config) => {
+const resolveAllPorts = (
+  params:TTaskParams,
+  docFileCtx:string,
+  config:TaskConfig
+):string[] => {
   const paramPorts = ensureArr(params.ports || [])
+  const allPorts = Object.values(config.repos).reduce((acc, repo) => {
+    repo.ports.length && acc.push(...repo.ports)
+    return acc
+  }, [] as string[])
 
   // Get the context for the docker image being run
   const envPorts = ensureArr(
     resolveContext(
       docFileCtx,
       // TODO: Create a port context selector,
-      // Example:
-      // {
-      //   [repos.backend.port]: [...backendAliases],
-      //   [repos.frontend.port]: [...frontendAliases],
-      // },
-      // [repos.backend.port, repos.frontend.port]
       config?.selectors?.ports,
-      // Make the default ALL ports
-      [config?.repos.backend?.port, config?.repos.frontend?.port],
+      allPorts
     )
   )
 
@@ -38,7 +40,7 @@ const resolveAllPorts = (params, envs, docFileCtx, config) => {
  *
  * @returns {Boolean} - True if ports should be bound
  */
-const skipPortBind = (ports) => {
+const skipPortBind = (ports:(string|number)[]) => {
   return Boolean(!isArr(ports) || ports.map(toBool).includes(false))
 }
 
@@ -50,21 +52,24 @@ const skipPortBind = (ports) => {
  *
  * @returns {Array} - Formatted port arguments to pass to the docker run cli
  */
-const addRunPorts = (params, envs, docFileCtx) => {
-  if (skipPortBind(params.ports)) return []
+export const addRunPorts = (
+  params:TTaskParams,
+  docFileCtx:string=``,
+  config:TaskConfig
+):string[] => {
+  
+  const ports = params.ports as (string|number)[]
+  if (skipPortBind(ports)) return []
 
-  return resolveAllPorts(params, envs, docFileCtx).reduce((acc, port) => {
-    port = isStr(port) ? port : `${port}`
+  return resolveAllPorts(params, docFileCtx, config)
+    .reduce((acc, port) => {
+      port = isStr(port) ? port : `${port}`
 
-    port &&
-      (port.includes(`:`) || port.includes(`/`)
-        ? acc.push(`-p`, port)
-        : acc.push(`-p`, `${port}:${port}`))
+      port &&
+        (port.includes(`:`) || port.includes(`/`)
+          ? acc.push(`-p`, port)
+          : acc.push(`-p`, `${port}:${port}`))
 
-    return acc
-  }, [])
-}
-
-module.exports = {
-  addRunPorts,
+      return acc
+    }, [])
 }

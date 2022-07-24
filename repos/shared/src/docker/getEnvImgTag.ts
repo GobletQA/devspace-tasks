@@ -1,6 +1,7 @@
-const { loadEnvs } = require('../envs/loadEnvs')
-const { noOpObj } = require('@keg-hub/jsutils')
-const { resolveContext } = require('../kubectl/resolveContext')
+import { noOpObj } from '@keg-hub/jsutils'
+import { loadEnvs } from '../envs/loadEnvs'
+import { resolveContext } from '../contexts/resolveContext'
+import { TaskConfig, TTaskParams, TEnvs } from '../shared.types'
 
 /**
  * Gets tag of an image set in the value file for the env
@@ -10,7 +11,12 @@ const { resolveContext } = require('../kubectl/resolveContext')
  *
  * @return {Object} - Resolved tagging option values
  */
-const getEnvImgTag = async (params = noOpObj, docFileCtx = ``, envs, config) => {
+export const getEnvImgTag = async (
+  params:TTaskParams = noOpObj,
+  docFileCtx:string = ``,
+  envs:TEnvs,
+  config:TaskConfig
+) => {
   envs = envs || loadEnvs(params.env)
 
   return resolveContext(
@@ -25,8 +31,4 @@ const getEnvImgTag = async (params = noOpObj, docFileCtx = ``, envs, config) => 
     config?.selectors?.imageTags,
     config?.repos?.root?.imageTag
   )
-}
-
-module.exports = {
-  getEnvImgTag,
 }

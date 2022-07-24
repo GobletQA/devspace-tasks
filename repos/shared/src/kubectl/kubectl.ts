@@ -1,4 +1,4 @@
-const { command } = require('../process/command')
+import { command } from '../process/command'
 
 /**
  * Runs a kubectl command and returns the output
@@ -10,8 +10,5 @@ const { command } = require('../process/command')
  *
  * @returns {Void}
  */
-const kubectl = command(`kubectl`)
+export const kubectl = command(`kubectl`)
 
-module.exports = {
-  kubectl,
-}

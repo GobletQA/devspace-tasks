@@ -2,7 +2,7 @@ import { loadEnvs } from '../envs/loadEnvs'
 import { runCmd, Logger } from '@keg-hub/cli-utils'
 import { processError } from '../process/processError'
 import { ensureArr, noOpObj, noPropArr, isObj, parseJSON } from '@keg-hub/jsutils'
-import { TCmdMethod, TCmd, TCmdParams, TExecResp } from './process.types'
+import { TCmdMethod, TCmd, TCmdParams, TCmdResp, TExecResp } from './process.types'
 
 
 /**
@@ -22,7 +22,7 @@ export const pm2Status = async ():Promise<Record<string, any>[]> => {
  *
  * @returns {Promise<void>}
  */
-export const cleanPm2Daemon = async (name, opts = noOpObj) => {
+export const cleanPm2Daemon = async (name, opts = noOpObj):Promise<void> => {
   try {
     // Remove any existing pm2 daemons that may already be running
     await runCmd(`pm2`, [`delete`, name], opts)
@@ -50,7 +50,7 @@ export const startPm2Daemon = async (
   opts:Record<any, any>,
   name:string,
   watch?:boolean
-):Promise<TExecResp> => {
+):Promise<TCmdResp> => {
 
   opts = opts || noOpObj
 
@@ -120,11 +120,12 @@ export const command = (executable:string):TCmdMethod => {
 
     const output = daemon
       ? await startPm2Daemon(executable, args, opts, pm2Name, watch)
-      : await runCmd(executable, args, opts)
+      : await runCmd(executable, args, opts) as TCmdResp
 
-    if (!isObj(output)) return output
+    if (typeof output !== 'object')
+      return output as string | number
 
-    const { data, error, exitCode } = output
+    const { data, error, exitCode } = output as TExecResp
 
     exitCode &&
       validExitCode &&
@@ -133,7 +134,7 @@ export const command = (executable:string):TCmdMethod => {
 
     log && data && Logger.pair(`Cmd Output:\n`, data)
 
-    return data
+    return data as string
   }
 }
 

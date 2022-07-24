@@ -1,8 +1,9 @@
-const { loadEnvs } = require('../envs/loadEnvs')
-const { getTagOptions } = require('./getTagOptions')
-const { shortContextMap } = require('../../constants')
-const { resolveImgName } = require('./resolveImgName')
-const { ensureArr, noOpObj, flatUnion } = require('@keg-hub/jsutils')
+import { TTagOpts } from './docker.types'
+import { loadEnvs } from '../envs/loadEnvs'
+import { getTagOptions } from './getTagOptions'
+import { resolveImgName } from './resolveImgName'
+import { ensureArr, noOpObj, flatUnion } from '@keg-hub/jsutils'
+import { TaskConfig, TTaskParams, TEnvs } from '../shared.types'
 
 /**
  * Parses the tagMatch argument and checks if there is a branch match
@@ -11,8 +12,14 @@ const { ensureArr, noOpObj, flatUnion } = require('@keg-hub/jsutils')
  
  * @return {Array} All tags types to be added to the docker image
  */
-const generateTagMatches = (params, docFileCtx = ``, envs, tagOptions) => {
-  const shortContext = shortContextMap[docFileCtx]
+const generateTagMatches = (
+  params:TTaskParams,
+  docFileCtx:string,
+  envs:TEnvs,
+  tagOptions:TTagOpts,
+  config:TaskConfig
+):string[] => {
+  const shortContext = config?.repos[docFileCtx || 'root']?.short
   const tags = flatUnion(
     ensureArr(params.tag),
     ensureArr(envs.IMAGE_BUILD_TAGS),
@@ -23,7 +30,7 @@ const generateTagMatches = (params, docFileCtx = ``, envs, tagOptions) => {
   if (!params.tagMatch) return tags
 
   const { tagMatch } = params
-  const [branch, tag] = tagMatch.split(`:`)
+  const [branch, tag] = (tagMatch as string).split(`:`)
 
   return tagOptions.branch === branch ? tags.concat(tag.split(',')) : tags
 }
@@ -35,16 +42,21 @@ const generateTagMatches = (params, docFileCtx = ``, envs, tagOptions) => {
  *
  * @returns {Array} - Generated tags to be passed to the docker build command
  */
-const resolveImgTags = async (params = noOpObj, docFileCtx = ``, envs) => {
+export const resolveImgTags = async (
+  params:TTaskParams = noOpObj,
+  docFileCtx:string = ``,
+  envs:TEnvs,
+  config:TaskConfig
+):Promise<string[]> => {
   const { env } = params
 
   envs = envs || loadEnvs(env)
-  const tagOptions = await getTagOptions(params, docFileCtx, envs)
-  const tagArr = generateTagMatches(params, docFileCtx, envs, tagOptions)
+  const tagOptions = await getTagOptions(params, docFileCtx, envs, config)
+  const tagArr = generateTagMatches(params, docFileCtx, envs, tagOptions, config)
 
   if (!tagArr.length) tagArr.push(`package`)
 
-  const imageName = resolveImgName((params = noOpObj), docFileCtx, envs)
+  const imageName = resolveImgName((params = noOpObj), docFileCtx, envs, config)
 
   return tagArr.reduce((imgTags, tag) => {
     const value = (tagOptions[tag] || tag).replace(/\s\n\t:\/\\/g, '.')
@@ -53,8 +65,4 @@ const resolveImgTags = async (params = noOpObj, docFileCtx = ``, envs) => {
 
     return imgTags
   }, [])
-}
-
-module.exports = {
-  resolveImgTags,
 }

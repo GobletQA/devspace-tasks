@@ -53,7 +53,7 @@ const start = async ({ params, config }) => {
   const deployments = getDeployments(config, context, skip, params.env)
 
   getNpmToken(config, params?.gitToken)
-  return await devspaceStart({ ...altParams, deployments }, { daemon, watch })
+  return await devspaceStart({ ...altParams, deployments }, { daemon, watch }, config)
 }
 
 module.exports = {

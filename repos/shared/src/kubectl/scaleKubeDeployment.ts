@@ -1,8 +1,10 @@
-const { kubectl } = require('./kubectl')
-const { noOpObj, isNum } = require('@keg-hub/jsutils')
-const { error } = require('@keg-hub/cli-utils')
-const { loadEnvs } = require('../envs/loadEnvs')
-const { resolveContext } = require('./resolveContext')
+
+import { kubectl } from './kubectl'
+import { error } from '@keg-hub/cli-utils'
+import { loadEnvs } from '../envs/loadEnvs'
+import { noOpObj, isNum } from '@keg-hub/jsutils'
+import { resolveContext } from '../contexts/resolveContext'
+import { TaskConfig, TTaskParams } from '../shared.types'
 
 /**
  * Scales a deployments replicas up or down based on passed in params
@@ -11,7 +13,7 @@ const { resolveContext } = require('./resolveContext')
  *
  * @return {Object} - Found pod object or undefined
  */
-const scaleKubeDeployment = async (params = noOpObj, config=noOpObj) => {
+export const scaleKubeDeployment = async (params:TTaskParams=noOpObj, config:TaskConfig) => {
   const { amount, context, env } = params
 
   !context &&
@@ -21,14 +23,10 @@ const scaleKubeDeployment = async (params = noOpObj, config=noOpObj) => {
   const envs = loadEnvs(env)
 
   // TODO: create a deployments selector
-  const deployment = resolveContext(context, config?.selectors?.deployments)
+  const deployment = resolveContext(context, config?.selectors?.deployments) as string
 
   return await kubectl([`scale`, `deploy`, deployment, `--replicas=${amount}`], {
     ...params,
     exec: true,
   })
-}
-
-module.exports = {
-  scaleKubeDeployment,
 }

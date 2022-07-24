@@ -10,7 +10,11 @@ import { TSelectors } from '../shared.types'
  *
  * @return {string} - Selector for referencing a kubernetes resource
  */
-export const resolveContext = (context = ``, selectors:TSelectors, fallback?:string|boolean) => {
+export const resolveContext = (
+  context:string = ``,
+  selectors:TSelectors,
+  fallback?:string|boolean|string[]
+) => {
   const lowerContext = context.toLowerCase()
 
   const match = Object.entries(selectors)

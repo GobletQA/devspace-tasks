@@ -1,7 +1,17 @@
 import { TAliasContext } from './contexts/contexts.types'
 
+export type JSONObject = {
+  [key: string]: JSONVal
+}
+type JSONArray = JSONVal[]
+export type JSONVal = string | number | boolean | JSONObject | JSONArray
+
+
+export type TParam = JSONVal
 export type TTaskParams = {
-  [key:string]: any
+  env?: TEnv
+  context?: string
+  [key:string]: TParam
 }
 
 export type TSelectors = Record<string, string[]>
@@ -17,6 +27,7 @@ export type TConfigSelectors = {
   repos: TSelectors
 
   // [repo.port]: [...repo.aliases]
+  // [repos.frontend.port]: [...frontendAliases]
   ports: TSelectors
   
   // [`app.kubernetes.io/component=${repo.deployment}`]: [...repo.aliases]
@@ -32,7 +43,7 @@ export type TConfigSelectors = {
 export class TaskConfig {
   envs?: TEnvs
   repos?: TRepos
-  paths?:TRepoPaths
+  paths?:TConfigPaths
   options: TOptions
   selectors: TConfigSelectors
   aliasContext: TAliasContext
@@ -45,7 +56,11 @@ export type TInRepo = {
   path?: string
   short?: string
   alias?: string[]
+  port?: string
+  ports?: string[]
   deployment?: string
+  image?: string
+  imageTag?: string
   [key: string]: any
 }
 
@@ -58,9 +73,13 @@ export type TRepo = {
   name: string
   path: string
   label: string
-  short?: string
+  short: string
+  image: string
   alias: string[]
+  ports: string[]
+  imageTag: string
   deployment: string
+  dockerFile?: string
 }
 
 export type TRepos = {
@@ -80,6 +99,8 @@ export type TEnvs = {
 }
 
 // The key name should match the name of the corresponding repo when repo path is not set
-export type TRepoPaths = {
+export type TConfigPaths = {
+  rootDir: string
+  dockerFiles?: string
   [key:string]: string
 }

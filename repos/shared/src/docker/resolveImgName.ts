@@ -9,11 +9,16 @@ import { TEnvs, TaskConfig, TTaskParams } from '../shared.types'
  
  * @return {string} - Resolved name of the docker image
  */
-export const resolveImgName = (params:TTaskParams, docFileCtx:string, envs:TEnvs, config:TaskConfig) => {
+export const resolveImgName = (
+  params:TTaskParams,
+  docFileCtx:string,
+  envs:TEnvs,
+  config:TaskConfig
+) => {
   const shortContext = config?.aliasContext?.short[docFileCtx]
 
   // Get the name of the image that will be built
-  const imgName =
+  const imgName =(
     params.image ||
     (docFileCtx && envs[`DS_${docFileCtx.toUpperCase()}_IMAGE`]) ||
     (shortContext && envs[`DS_${shortContext.toUpperCase()}_IMAGE`]) ||
@@ -22,6 +27,7 @@ export const resolveImgName = (params:TTaskParams, docFileCtx:string, envs:TEnvs
       // TODO: Create an image context selector,
       config?.selectors?.images,
     )
+  ) as string
 
   !imgName &&
     error.throwError(
@@ -33,7 +39,7 @@ export const resolveImgName = (params:TTaskParams, docFileCtx:string, envs:TEnvs
 
   // Otherwise parse the default envs.IMAGE value to get the provider url
   // Then add the image name to the provider url
-  const imgSplit = `${envs.DOCKER_REGISTRY || envs.IMAGE || ``}`.split('/')
+  const imgSplit = `${envs.DS_DOCKER_REGISTRY || envs.DS_IMAGE || ``}`.split('/')
   imgSplit.pop()
   imgSplit.push(imgName)
 

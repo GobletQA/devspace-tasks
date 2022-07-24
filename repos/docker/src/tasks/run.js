@@ -8,7 +8,7 @@ const { addRunPorts } = require('../../utils/docker/addRunPorts')
 const { getTagOptions } = require('../../utils/docker/getTagOptions')
 const { appContextAlias, dbContextAlias } = require('../../constants')
 const { resolveImgName } = require('../../utils/docker/resolveImgName')
-const { resolveContext } = require('../../utils/kubectl/resolveContext')
+const { resolveContext } = require('../../utils/contexts/resolveContext')
 
 /**
  * TODO: @lance-tipton We could try to parse the cmd form the options array

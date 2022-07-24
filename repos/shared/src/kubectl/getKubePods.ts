@@ -1,5 +1,10 @@
-const { kubectl } = require('./kubectl')
-const { noOpObj, parseJSON } = require('@keg-hub/jsutils')
+import { kubectl } from './kubectl'
+import { TTaskParams, JSONObject } from '../shared.types'
+import { noOpObj, parseJSON } from '@keg-hub/jsutils'
+
+type TKubeRes = {
+  items: JSONObject[]
+}
 
 /**
  * Runs kubectl get pods command, and converts the respond into a JSON object
@@ -7,12 +12,10 @@ const { noOpObj, parseJSON } = require('@keg-hub/jsutils')
  *
  * @return {Object} - JSON object of the currently running pods
  */
-const getKubePods = async (params = noOpObj) => {
+export const getKubePods = async (params:TTaskParams = noOpObj):Promise<TKubeRes> => {
   const data = await kubectl([`get`, `pods`, `-o`, `json`], { ...params, exec: true })
 
+  // @ts-ignore
   return parseJSON(data, false)
 }
 
-module.exports = {
-  getKubePods,
-}

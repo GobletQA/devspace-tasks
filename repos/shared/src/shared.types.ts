@@ -42,8 +42,8 @@ export type JSONVal = string | number | boolean | JSONObject | JSONArray
 export type TParam = JSONVal
 export type TTaskParams = {
   env?: TEnv
+  log?: boolean
   context?: string
-  log: boolean
   [key:string]: TParam
 }
 

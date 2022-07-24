@@ -1,7 +1,8 @@
 import { devspace } from './devspace'
 import { noOpObj } from '@keg-hub/jsutils'
-import { TaskConfig, TTaskParams } from '../shared.types'
 import { getCmdOptions } from './getCmdOptions'
+import { TaskConfig, TTaskParams } from '../shared.types'
+
 
 /**
  * Flags for the devspace build command pulled from the task definition options

@@ -1,7 +1,10 @@
-const { get } = require('@keg-hub/jsutils')
-const { Logger } = require('@keg-hub/cli-utils')
-const { pm2Status } = require('../../utils/process/command')
-const { devspaceRunning } = require('../../utils/devspace/devspaceRunning')
+import { get } from '@keg-hub/jsutils'
+import { Logger } from '@keg-hub/cli-utils'
+import { pm2Status } from '@TSKShared/process/command'
+import { TDSConfig } from '@TSKShared/devspace/devspace.types'
+import { devspaceRunning } from '@TSKShared/devspace/devspaceRunning'
+import { TTask, TTaskArgs, TTaskParams } from '@TSKShared/shared.types'
+
 
 const STOPPED = Logger.colors.red(`Stopped`)
 const RUNNING = Logger.colors.green(`Running`)
@@ -28,8 +31,8 @@ const getPm2Status = async () => {
  *
  * @returns {Object} - Status metadata of devspace
  */
-const getDevspaceStatus = async (params) => {
-  const devspacePod = await devspaceRunning({ ...params, exec: true })
+const getDevspaceStatus = async (params:TTaskParams, config:TDSConfig) => {
+  const devspacePod = await devspaceRunning({ ...params, exec: true }, config)
   return !devspacePod
     ? { 'Devspace        ': { status: STOPPED } }
     : {
@@ -52,9 +55,9 @@ const getDevspaceStatus = async (params) => {
  *
  * @returns {void}
  */
-const status = async ({ params }) => {
+const statusAction = async ({ params, config }:TTaskArgs) => {
   const status = {
-    ...(await getDevspaceStatus(params)),
+    ...(await getDevspaceStatus(params, config)),
     ...(await getPm2Status()),
   }
 
@@ -69,12 +72,10 @@ const status = async ({ params }) => {
   Logger.empty()
 }
 
-module.exports = {
-  status: {
-    name: 'status',
-    action: status,
-    example: 'yarn task devspace status <options>',
-    description: 'Gets the current status of host environment',
-    options: {},
-  },
+export const status:TTask = {
+  name: 'status',
+  action: statusAction,
+  example: 'yarn task devspace status <options>',
+  description: 'Gets the current status of host environment',
+  options: {},
 }

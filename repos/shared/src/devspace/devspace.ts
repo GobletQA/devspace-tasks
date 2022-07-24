@@ -30,6 +30,7 @@ const addDefaultArgs = async (cmd:string, params:TTaskParams, config:TaskConfig)
 
   const defArgs = [
     `--config`,
+    // TODO: have this properly resolve the devspace config path
     getConfigPath(params.config),
     `--profile`,
     params.profile || params.env,

@@ -1,8 +1,8 @@
 const path = require('path')
 const { scriptsDir } = require('../../paths')
 const { Logger } = require('@keg-hub/cli-utils')
-const { loadEnvs } = require('../../utils/envs/loadEnvs')
-const { getNpmToken } = require('../../utils/envs/getNpmToken')
+const { loadEnvs } = require('@TSKShared/envs/loadEnvs')
+const { getNpmToken } = require('@TSKShared/envs/getNpmToken')
 const { dockerLogin } = require(path.join(scriptsDir, 'js/dockerLogin'))
 
 /**

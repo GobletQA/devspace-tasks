@@ -24,7 +24,7 @@ export const getTagOptions = async (
 ):Promise<TTagOpts> => {
   const { version } = getRepoPackage({ repo: config.repos.root, config })
 
-  envs = envs || loadEnvs(params.env)
+  envs = envs || loadEnvs(params.env, config)
   const commit = await getCommitHash(config)
   const branch = await getCurrentBranch(config)
 

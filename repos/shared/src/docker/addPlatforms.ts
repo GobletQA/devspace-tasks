@@ -7,7 +7,7 @@ import { noPropArr } from '@keg-hub/jsutils'
  *
  * @returns {Array<string>} - Platforms converted into the docker build argument format
  */
-export const addPlatforms = (platforms = noPropArr, push) => {
+export const addPlatforms = (platforms:string[] = noPropArr, push:boolean) => {
   return platforms.length && push ? [`--platform`, platforms.join(`,`)] : noPropArr
 }
 

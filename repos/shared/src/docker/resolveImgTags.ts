@@ -50,7 +50,7 @@ export const resolveImgTags = async (
 ):Promise<string[]> => {
   const { env } = params
 
-  envs = envs || loadEnvs(env)
+  envs = envs || loadEnvs(env, config)
   const tagOptions = await getTagOptions(params, docFileCtx, envs, config)
   const tagArr = generateTagMatches(params, docFileCtx, envs, tagOptions, config)
 

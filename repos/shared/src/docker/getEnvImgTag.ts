@@ -17,7 +17,7 @@ export const getEnvImgTag = async (
   envs:TEnvs,
   config:TaskConfig
 ) => {
-  envs = envs || loadEnvs(params.env)
+  envs = envs || loadEnvs(params.env, config)
 
   return resolveContext(
     docFileCtx,

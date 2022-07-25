@@ -20,7 +20,7 @@ export const scaleKubeDeployment = async (params:TTaskParams=noOpObj, config:Tas
     error.throwError(`The deployment context param is required to scale a deployment`)
   !isNum(amount) && error.throwError(`The amount param is required to scale a deployment`)
 
-  const envs = loadEnvs(env)
+  const envs = loadEnvs(env, config)
 
   // TODO: create a deployments selector
   const deployment = resolveContext(context, config?.selectors?.deployments) as string

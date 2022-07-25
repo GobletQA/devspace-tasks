@@ -1,12 +1,11 @@
 import { getNpmToken } from '@TSKShared/envs/getNpmToken'
-import { TTask, TTaskArgs } from '@TSKShared/shared.types'
-import { TDSConfig } from '@TSKShared/devspace/devspace.types'
 import { devspaceStart } from '@TSKShared/devspace/devspaceStart'
 import { resolveContext } from '@TSKShared/contexts/resolveContext'
 import { getDeployments } from '@TSKShared/devspace/getDeployments'
 import { setPullPolicyEnv } from '@TSKShared/envs/setPullPolicyEnv'
+import { TaskConfig, TTask, TTaskArgs } from '@TSKShared/shared.types'
 
-const setStartEnvs = (params, config:TDSConfig) => {
+const setStartEnvs = (params, config:TaskConfig) => {
   const { install, pull, build } = params
   setPullPolicyEnv(pull)
 

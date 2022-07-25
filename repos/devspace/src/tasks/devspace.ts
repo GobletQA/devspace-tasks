@@ -1,23 +1,27 @@
+import { attach } from './attach'
+import { build } from './build'
+import { clean } from './clean'
+import { deploy } from './deploy'
+import { log } from './log'
+import { run } from './run'
+import { status } from './status'
+import { sync } from './sync'
 import { cmd } from './cmd'
 import { start } from './start'
 
-const devspace = {
+export const devspace = {
   name: 'devspace',
   alias: ['ds', 'dev'],
   tasks: {
     cmd,
+    log,
+    run,
+    sync,
     start,
-    ...require('./attach'),
-    ...require('./build'),
-    ...require('./clean'),
-    ...require('./deploy'),
-    ...require('./log'),
-    ...require('./run'),
-    ...require('./status'),
-    ...require('./sync'),
+    build,
+    clean,
+    attach,
+    deploy,
+    status,
   },
-}
-
-export {
-  devspace
 }

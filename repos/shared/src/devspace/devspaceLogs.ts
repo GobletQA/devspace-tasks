@@ -16,7 +16,7 @@ export const devspaceLogs = async (params:TTaskParams=noOpObj, config:TaskConfig
   const cmdArgs = [`logs`]
   follow && cmdArgs.push(`--follow`)
 
-  const envs = loadEnvs(env)
+  const envs = loadEnvs(env, config)
   // TODO: use config??.selectors?.pods to create pods for kubernetes/component
   // [`app.kubernetes.io/component=${repo.deployment}`]: [...repo.alias],
   const selector = resolveContext(context, config?.selectors?.pods)

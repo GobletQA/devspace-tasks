@@ -1,10 +1,9 @@
 import { error } from '@keg-hub/cli-utils'
-import { TDSConfig, TDeployArr } from './devspace.types'
-import { TEnv, TSelectors } from '../shared.types'
 import { getDeploymentOpts } from './getDeploymentOpts'
 import { exists, isStr, noOpArr } from '@keg-hub/jsutils'
 import { resolveContext } from '../contexts/resolveContext'
 import { setDeploymentEnvs } from '../envs/setDeploymentEnvs'
+import { TaskConfig, TEnv, TSelectors, TDeployArr } from '../shared.types'
 
 type TFilterdDeploys = {
   skipArr: TDeployArr
@@ -95,7 +94,7 @@ const findDeployments = (
  * @return {string} - Context converted into a string of app deployments
  */
 export const getDeployments = (
-  config:TDSConfig,
+  config:TaskConfig,
   context?:string,
   skip?:string|string[],
   env?:TEnv

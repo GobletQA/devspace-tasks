@@ -8,7 +8,7 @@ import { addRunPorts } from '@TSKShared/docker/addRunPorts'
 import { getTagOptions } from '@TSKShared/docker/getTagOptions'
 import { resolveImgName } from '@TSKShared/docker/resolveImgName'
 import { resolveContext } from '@TSKShared/contexts/resolveContext'
-import { TTask, TTaskArgs, TTaskParams } from '@TSKShared/shared.types'
+import { TaskConfig, TTask, TTaskArgs, TTaskParams, TEnvs } from '@TSKShared/shared.types'
 
 /**
  * TODO: @lance-tipton We could try to parse the cmd form the options array
@@ -28,12 +28,20 @@ const getRunCmd = (params:TTaskParams) => {
  *
  * @returns {string} - Image to use when running the container
  */
-const getImgToRun = async (params, docFileCtx, envs, config) => {
-  let tag = params?.image?.includes(':')
-    ? params?.image?.split(':').pop()
-    : (await getTagOptions(params, docFileCtx, envs, config))?.[params?.tag] || params?.tag
+const getImgToRun = async (
+  params:TTaskParams,
+  docFileCtx:string,
+  envs:TEnvs,
+  config:TaskConfig
+) => {
+  const pImg = params?.image as string
+  const pTag = params?.tag as string
+  
+  let tag = pImg.includes(':')
+    ? pImg.split(':').pop()
+    : (await getTagOptions(params, docFileCtx, envs, config))?.[pTag] || pTag
 
-  const image = resolveImgName(params, docFileCtx, envs)
+  const image = resolveImgName(params, docFileCtx, envs, config)
 
   return image
     ? `${image}:${tag}`
@@ -46,13 +54,14 @@ const getImgToRun = async (params, docFileCtx, envs, config) => {
  *
  * @returns {Array} - Generated docker cli run command arguments
  */
-const getDockerRunArgs = ({ remove, attach, name, pull }) => {
+const getDockerRunArgs = ({ remove, attach, name, pull }:TTaskParams) => {
   const args = []
   remove && args.push(`--rm`)
   attach && args.push(`-it`)
   name && args.push(`--name`, name)
+  const pullOpts = [`missing`, `never`, `always`]
 
-  [(`missing`, `never`, `always`)].includes(pull)
+  pullOpts.includes(pull as string)
     ? args.push(`--pull=${pull}`)
     : args.push(`--pull=never`)
 
@@ -71,11 +80,10 @@ const getDockerRunArgs = ({ remove, attach, name, pull }) => {
  *
  * @returns {void}
  */
-const runImg = async (args:TTaskArgs) => {
-  const { params, options, config } = args
+const runImg = async ({ params, config }:TTaskArgs) => {
   const { context, env, log } = params
 
-  const envs = loadEnvs(env)
+  const envs = loadEnvs(env, config)
   const token = getNpmToken(config)
   const allEnvs = { ...envs, NPM_TOKEN: token }
 
@@ -85,22 +93,22 @@ const runImg = async (args:TTaskArgs) => {
     context,
     config?.selectors?.repos,
     config?.selectors?.root
-  )
+  ) as string
 
-  const imgToRun = await getImgToRun(params, docFileCtx, envs)
+  const imgToRun = await getImgToRun(params, docFileCtx, envs, config)
 
   const cmdArgs = [
     `run`,
     ...getDockerRunArgs(params),
     ...addRunEnvs(allEnvs, docFileCtx),
-    ...addRunPorts(params, allEnvs, docFileCtx),
+    ...addRunPorts(params, docFileCtx, config),
     imgToRun,
-    ...getRunCmd(params, options),
+    ...getRunCmd(params),
   ].filter((arg) => arg)
 
   log && Logger.pair(`Running Cmd:`, `docker ${cmdArgs.join(' ')}\n`)
 
-  const output = await docker(cmdArgs, { cwd: appRoot, env: allEnvs })
+  const output = await docker(cmdArgs, { cwd: config.paths.repoRoot, env: allEnvs })
   log && Logger.log(output)
 
   return output
@@ -112,9 +120,8 @@ export const run:TTask = {
   alias: ['rn', 'rnu'],
   options: {
     context: {
-      example: `--context proxy`,
+      example: `--context backend`,
       alias: ['ctx', `name`, `type`],
-      allowed: [...appContextAlias, ...dbContextAlias],
       description: `Context or name to use when resolving the Dockerfile to built`,
     },
     cmd: {

@@ -5,8 +5,12 @@
     "outDir": "./dist",
     "paths": {
       "@TSKRoot": [ "../../" ],
+      "@TSKDocker": [ "../docker/src" ],
+      "@TSKDocker/*": ["../docker/src/*"],
       "@TSKShared": [ "../shared/src" ],
-      "@TSKShared/*": ["../shared/src/*"]
+      "@TSKShared/*": ["../shared/src/*"],
+      "@TSKScripts/*": [ "../../scripts/*" ],
+      "@TSKConfigs/*": [ "../../configs/*" ]
     }
   },
   "include": ["src/**/*"],

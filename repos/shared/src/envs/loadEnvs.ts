@@ -1,7 +1,7 @@
-import { noPropArr, exists, isArr } from '@keg-hub/jsutils'
+import { exists, isStr } from '@keg-hub/jsutils'
 import { addToProcess } from '@keg-hub/cli-utils'
 import { loadConfigs } from '@keg-hub/parse-config'
-
+import { TaskConfig } from '..//shared.types'
 /**
  * Internal env cache to speed up task execution
  * @type {Object}
@@ -20,12 +20,12 @@ const __CACHED_ENVS = {}
  */
 export const loadEnvs = (
   env:string=process.env.NODE_ENV,
-  locations?:string[],
+  config:TaskConfig,
   name?:string,
   cache?:boolean
 ) => {
   cache = exists(cache) ? cache : true
-  locations = isArr(locations) ? locations : noPropArr
+  const locations = Object.values(config.paths).filter(isStr)
 
   // Check if the envs were already loaded and use the cach if it exsts
   const cacheKey = `${env}-${locations.sort().join('-')}`
@@ -33,8 +33,8 @@ export const loadEnvs = (
 
   const mergedEnvs = loadConfigs({
     env,
-    name,
     locations,
+    name: name || config.repos.root.name,
   })
 
   // Add the loaded envs to the current process.env

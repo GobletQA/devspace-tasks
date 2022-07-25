@@ -1,15 +1,10 @@
-import os from 'os'
-import path from 'path'
+import { locationContext } from '../contexts/locationContext'
 
+/**
+ * Gets the absolute path to the repos directory
+ * Works with absolute paths, relative to repo root, and users home directory,
+ */
 export const getReposPath = (rootDir:string, reposDir?:string, homedir?:string) => {
-  if(!reposDir) return path.join(rootDir, `repos`)
-
-  if(reposDir.startsWith(`/`)) return reposDir
-
-  if(reposDir.startsWith(`~/`)){
-    homedir = homedir || os.homedir()
-    return path.join(homedir, reposDir)
-  }
-
-  return path.join(rootDir, reposDir)
+  const absLoc = locationContext(rootDir, reposDir, homedir)
+  return absLoc || rootDir
 }

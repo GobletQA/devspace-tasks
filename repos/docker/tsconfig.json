@@ -5,10 +5,15 @@
     "outDir": "./dist",
     "paths": {
       "@TSKRoot": [ "../../" ],
+      "@TSKScripts": [ "../../scripts" ],
       "@TSKDocker": [ "../docker/src" ],
       "@TSKDocker/*": ["../docker/src/*"],
       "@TSKShared": [ "../shared/src" ],
-      "@TSKShared/*": ["../shared/src/*"]
+      "@TSKShared/*": ["../shared/src/*"],
+      "@TSKStore": [ "../store/src" ],
+      "@TSKStore/*": ["../store/src/*"],
+      "@TSKScripts/*": [ "../../scripts/*" ],
+      "@TSKConfigs/*": [ "../../configs/*" ]
     }
   },
   "include": ["src/**/*"],

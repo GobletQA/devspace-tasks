@@ -11,7 +11,7 @@ import { TTaskParams, TaskConfig } from '../shared.types'
  */
 export const getDevspaceContext = (params:TTaskParams = noOpObj, config:TaskConfig) => {
   const { namespace, kubeContext, env } = params
-  const { DS_KUBE_NAMESPACE = `devspace`, DS_KUBE_CONTEXT } = loadEnvs(env)
+  const { DS_KUBE_NAMESPACE = `devspace`, DS_KUBE_CONTEXT } = loadEnvs(env, config)
   const ns = namespace || config?.options?.namespace || DS_KUBE_NAMESPACE
   const ctx = kubeContext || config?.options?.context || DS_KUBE_CONTEXT
 

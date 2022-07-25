@@ -1,4 +1,3 @@
-import { TAliasContext } from './contexts/contexts.types'
 
 export type TTaskOptionType = 'arr' | 'array' | 'obj' | 'object' | 'num' | 'number' | 'boolean' | 'bool' | 'string' | 'str'
 
@@ -22,14 +21,22 @@ export type TTaskArgs = {
   [key:string]: any
 }
 
+export type TTaskAction = (args:TTaskArgs) => Promise<any> | any
+
 export type TTask = {
   name: string,
-  alias?: string[],
-  example?: string,
-  description?: string,
+  tasks?: TTasks
+  alias?: string[]
+  example?: string
+  config: TaskConfig
+  action?: TTaskAction
+  description?: string
   options?: TTaskOptions
-  action: (args:TTaskArgs) => any,
   [key:string]: any
+}
+
+export type TTasks = {
+  [key:string]: TTask
 }
 
 export type JSONObject = {
@@ -47,7 +54,12 @@ export type TTaskParams = {
   [key:string]: TParam
 }
 
-export type TSelectors = Record<string, string[]>
+export type TSelectorMeta = {
+  alias: string[]
+  value?: any
+}
+
+export type TSelectors = Record<string, TSelectorMeta>
 
 export type TConfigSelectors = {
   // Root application selector - Used as default 
@@ -73,11 +85,43 @@ export type TConfigSelectors = {
   deployments: TSelectors
 }
 
+export type TAliasContext = {
+  all: string[]
+  short?: Record<string, string>
+  selectors?: TConfigSelectors
+}
+
+
+export type TInternalPaths = {
+  scriptsDir: string
+  configsDir: string
+  [key:string]: string
+}
+
+export type TInternal = {
+  envs?: TEnvs
+  paths?: TInternalPaths
+}
+
+export type TInTaskConfig = {
+  envs?: TEnvs
+  repos: TInRepos
+  rootDir: string
+  options: TOptions
+  reposDir?: string
+  homeDir?: string
+  valuesDir?: string
+  configsDir?: string
+  devspaceDir?: string
+  dockerFilesDir?: string
+}
+
 export class TaskConfig {
   envs?: TEnvs
   repos?: TRepos
-  paths?:TConfigPaths
   options: TOptions
+  paths?:TConfigPaths
+  __internal: TInternal
   selectors: TConfigSelectors
   aliasContext: TAliasContext
 }
@@ -91,9 +135,9 @@ export type TInRepo = {
   alias?: string[]
   port?: string
   ports?: string[]
-  deployment?: string
   image?: string
   imageTag?: string
+  deployment?: string
   dockerFile?: string
   [key: string]: any
 }
@@ -113,6 +157,7 @@ export type TRepo = {
   image: string
   deployment: string
   imageTag?: string
+  imageFrom?: string
   valuesFile?: string
   dockerFile?: string
   configsDir?: string
@@ -121,6 +166,12 @@ export type TRepo = {
 
 export type TRepos = {
   [key: string]: TRepo
+}
+
+export type TBuildReposArgs = {
+  rootDir:string
+  repos:TInRepos,
+  paths:TReposPaths,
 }
 
 export type TOptions = {
@@ -149,4 +200,17 @@ export type TConfigPaths = {
   configsDir?: string
   devspaceDir?: string
   dockerFilesDir?: string
+}
+
+export type TDeployArr = string[]
+export type TActiveDeploys = Record<string, string>
+export type TDeployOpts = [TSelectors, string[], TActiveDeploys]
+
+export type TSearchLocArgs = {
+  loc:string,
+  file?: string
+  type?: string
+  rootDir:string,
+  asDir?: boolean
+  fallback?:string,
 }

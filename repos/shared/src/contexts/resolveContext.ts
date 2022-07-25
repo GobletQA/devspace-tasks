@@ -1,5 +1,5 @@
 import { exists } from '@keg-hub/jsutils'
-import { TSelectors } from '../shared.types'
+import { TSelectors, TSelectorMeta } from '../shared.types'
 
 /**
  * Resolves the context used to reference a kubernetes resource
@@ -18,10 +18,12 @@ export const resolveContext = (
   const lowerContext = context.toLowerCase()
 
   const match = Object.entries(selectors)
-    .reduce((found, [name, alias]) => {
+    .reduce((found, [name, meta]:[string, TSelectorMeta]) => {
+      const {alias, value} = meta
+
       return found || !alias.includes(lowerContext)
         ? found
-        : name
+        : exists(value) ? value : name
     }, false)
 
   return match

@@ -1,9 +1,8 @@
 import { get } from '@keg-hub/jsutils'
 import { Logger } from '@keg-hub/cli-utils'
 import { pm2Status } from '@TSKShared/process/command'
-import { TDSConfig } from '@TSKShared/devspace/devspace.types'
 import { devspaceRunning } from '@TSKShared/devspace/devspaceRunning'
-import { TTask, TTaskArgs, TTaskParams } from '@TSKShared/shared.types'
+import { TaskConfig, TTask, TTaskArgs, TTaskParams } from '@TSKShared/shared.types'
 
 
 const STOPPED = Logger.colors.red(`Stopped`)
@@ -31,7 +30,7 @@ const getPm2Status = async () => {
  *
  * @returns {Object} - Status metadata of devspace
  */
-const getDevspaceStatus = async (params:TTaskParams, config:TDSConfig) => {
+const getDevspaceStatus = async (params:TTaskParams, config:TaskConfig) => {
   const devspacePod = await devspaceRunning({ ...params, exec: true }, config)
   return !devspacePod
     ? { 'Devspace        ': { status: STOPPED } }

@@ -1,35 +1,82 @@
-import { TaskConfig, TConfigSelectors } from '../shared.types'
+import { exists } from '@keg-hub/jsutils'
+import { KUBE_COMPONENT_LABEL } from '../constants'
+import { TaskConfig, TConfigSelectors, TSelectors, TRepo } from '../shared.types'
 
-// export type TSelectors = Record<string, string[]>
-// export type TConfigSelectors = {
-//   // Root application selector - Used as default 
-//   root: string
-  
-//   // [repo.image]: [...repo.aliases]
-//   images: TSelectors
+type TSelectorCB = (selector:TSelectors, repo:TRepo) => TSelectors
 
-//   // [repo.name]: [...repo.aliases]
-//   repos: TSelectors
+/**
+ * Generates a custom selector for kubernetes pods
+ * assumes they includes the pre-defined KUBE_COMPONENT_LABEL
+ * May need to re-work this to make it customizable
+ */
+const podsSelector = (
+  selector:TSelectors,
+  repo:TRepo
+) => {
+  repo.deployment
+    && (selector[`${KUBE_COMPONENT_LABEL}=${repo.deployment}`] = {alias: [...repo.alias]})
+  return selector
+}
 
-//   // [repo.port]: [...repo.aliases]
-//   // [repos.frontend.port]: [...frontendAliases]
-//   ports: TSelectors
-  
-//   // [`app.kubernetes.io/component=${repo.deployment}`]: [...repo.aliases]
-//   pods: TSelectors
+/**
+ * Generates a selector for a apps ports used in port forwarding
+ * Ports must be defined on the repos ports property
+ */
+const portsSelector = (
+  selector:TSelectors,
+  repo:TRepo
+) => {
+  repo.ports.length
+    && (selector[repo.name] = {alias: [...repo.alias], value: repo.ports})
+  return selector
+}
 
-//   // [repo.image]: [...repo.aliases]
-//   imageTags: TSelectors
+/**
+ * General helper, that generates a selector based on the passed in key
+ * Expects the key to exist as a repos property, and maps it to the repos alias
+ */
+const generalSelector = (key:string):TSelectorCB => {
+  return (
+    selector:TSelectors,
+    repo:TRepo
+  ) => {
+    exists(repo[key])
+      && (selector[repo[key]] = {alias: [...repo.alias]})
+    return selector
+  }
+}
 
-//   // [repo.deployment]: [...repo.aliases]
-//   deployments: TSelectors
-// }
 
+/**
+ * Helper to call a callback for each repo in the config
+ * Callback is used to generate a selector for each repo based on a key
+ */
+const addSelector = (
+  config:TaskConfig,
+  callback:TSelectorCB
+) => {
+  return Object.entries(config?.repos)
+    .reduce((selector, [key, repo]:[string, TRepo]) => {
+      return callback(selector, repo)
+    }, {} as TSelectors)
+}
+
+/**
+ * Builds the custom selectors for each type in the config
+ * Allows selecting specific apps and their properties via an alias
+ */
 export const selectorContexts = (
-  config:Partial<TaskConfig> & Pick<TaskConfig, 'repos' | 'paths' | 'aliasContext'>
+  config:TaskConfig
 ):TConfigSelectors => {
-  
-  
-  
-  return {}
+  const selectors:Partial<TConfigSelectors> = {}
+
+  selectors.root = config?.repos?.root?.name
+  selectors.pods = addSelector(config, podsSelector)
+  selectors.ports = addSelector(config, portsSelector)
+  selectors.repos = addSelector(config, generalSelector(`name`))
+  selectors.images = addSelector(config, generalSelector(`image`))
+  selectors.imageTags = addSelector(config, generalSelector(`imageTag`))
+  selectors.deployments = addSelector(config, generalSelector(`deployment`))
+
+  return selectors as TConfigSelectors
 }

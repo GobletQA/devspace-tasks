@@ -1,13 +1,19 @@
-import { TSelectors, TRepo } from '../shared.types'
-import { TDSConfig, TDeployOpts, TDeployArr, TActiveDeploys } from './devspace.types'
-
+import {
+  TEnv,
+  TRepo,
+  TSelectors,
+  TDeployArr,
+  TaskConfig,
+  TDeployOpts,
+  TActiveDeploys,
+} from '../shared.types'
 
 /**
  * Gets the all deployment options
  * @param {Object} config - DevSpace deployment config 
  * @return {Array} - All allow apps that can be deployed as object and array
  */
-export const getDeploymentOpts = (config: TDSConfig):TDeployOpts => {
+export const getDeploymentOpts = (config: TaskConfig, env:TEnv):TDeployOpts => {
   const { repos } = config
 
   const activeMap = {}

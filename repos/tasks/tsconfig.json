@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "paths": {
+      "@TSKRoot": [ "../../" ],
+      "@TSKDevspace": [ "../devspace/src" ],
+      "@TSKDevspace/*": ["../devspace/src/*"],
+      "@TSKDocker": [ "../docker/src" ],
+      "@TSKDocker/*": ["../docker/src/*"],
+      "@TSKShared": [ "../shared/src" ],
+      "@TSKShared/*": ["../shared/src/*"],
+      "@TSKStore": [ "../store/src" ],
+      "@TSKStore/*": ["../store/src/*"],
+      "@TSKScripts/*": [ "../../scripts/*" ],
+      "@TSKConfigs/*": [ "../../configs/*" ]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
